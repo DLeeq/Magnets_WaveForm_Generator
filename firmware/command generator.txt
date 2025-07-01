@@ -35,24 +35,22 @@ uint8_t CRC8(const uint8_t *data, uint8_t length)
 const int channel = 1;
 const FormChannel form = SIN;
 const int amp = 100; //[%]
-const float freq = 200; //[Hz]
-const int phase = 360; //[°]
+const float freq = 230; //[Hz]
+const int phase = 180; //[°]
 
-uint8_t buf[6] = {  (channel << 4) | form, 
+uint8_t buf[8] = { 0xFF, (channel << 4) | form, 
                     amp * 254 / 100, 
                     (int)(freq*100)/255/255%255, 
                     (int)(freq*100)/255%255, 
                     (int)(freq*100)%255, 
-                    phase * 254 / 360   };
+                    phase * 254 / 360,
+                    (int)CRC8(buf+1, 6)
+                    };
 
 int main()
 {
-    std::cout << "ff" << " ";
-    
-    for(int i = 0; i < 6; i++)
+    for(int i = 0; i < 8; i++)
         std::cout << std::hex << (int)buf[i] << " ";
-
-    std::cout << std::hex << (int)CRC8(buf, 6) << " ";
 
     return 0;
 }
