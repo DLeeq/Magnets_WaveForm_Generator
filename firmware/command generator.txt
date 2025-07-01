@@ -2,6 +2,8 @@
 #include <iomanip>
 #include <cstdint>
 
+enum FormChannel {OFF, SIN, TRG, SAW, SQR};
+
 uint8_t CRC8(const uint8_t *data, uint8_t length) 
 {
    uint8_t crc = 0x00;
@@ -31,16 +33,17 @@ uint8_t CRC8(const uint8_t *data, uint8_t length)
 }
 
 const int channel = 1;
-const int form = 1;
-const int amp = 111;
-const int freq = 111;
-const int phase = 111;
+const FormChannel form = SIN;
+const int amp = 100; //[%]
+const float freq = 200; //[Hz]
+const int phase = 360; //[°]
 
-uint8_t buf[6] = {  (channel << 4)|form, amp, 
-                    (int)(freq)/255/255%255, 
-                    (int)(freq)/255%255, 
-                    (int)(freq)%255, 
-                    phase   };
+uint8_t buf[6] = {  (channel << 4) | form, 
+                    amp * 254 / 100, 
+                    (int)(freq*100)/255/255%255, 
+                    (int)(freq*100)/255%255, 
+                    (int)(freq*100)%255, 
+                    phase * 254 / 360   };
 
 int main()
 {

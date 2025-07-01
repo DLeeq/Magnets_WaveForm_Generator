@@ -9,15 +9,13 @@ struct GenChannel
 {
   FormChannel form;
 
-  //Сырые значения амплитуды, частоты и фазы  (0...254, 0...100000, 0...254)
-
-  uint8_t raw_amp;
-  uint32_t raw_freq;
-  uint8_t raw_phase;
+  //Обработанные значения амплитуды, частоты и фазы (0...100, 0...1000.00, 0...360)
+  uint16_t amp;
+  float freq;
+  uint16_t phase;
 
   //Предварительные вычисленные удобные значения
   //для ускорения работы прерываний
-
   uint32_t coef_amp;
   uint32_t step_phase;
   uint32_t shift_phase;

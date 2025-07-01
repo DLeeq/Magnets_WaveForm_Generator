@@ -8,9 +8,9 @@ void channelsInit()
   {
     channels[i].form = OFF;
 
-    channels[i].raw_amp = 0;
-    channels[i].raw_freq = 0;
-    channels[i].raw_phase = 0;
+    channels[i].amp = 0;
+    channels[i].freq = 0;
+    channels[i].phase = 0;
     
     channels[i].coef_amp = 0;
     channels[i].step_phase = 0;
