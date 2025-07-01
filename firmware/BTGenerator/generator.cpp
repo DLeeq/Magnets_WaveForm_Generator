@@ -35,26 +35,46 @@ void IRAM_ATTR signalGenerator()
     uint32_t phase = 0;
     phase = (channels[i].shift_phase + channels[i].current_phase) * 32 / 3200000;
 
-    if(phase >= 32)
-      phase -= 32;
+    if(phase >= 32) phase -= 32;
 
-    uint8_t val = 0;
-    switch (channels[i].form)
+    int32_t val = 0;
+
+    if(channels[i].form != OFF)
     {
-      case OFF: val = 0; break;
-      case SIN: val = SIN_TABLE[phase] * channels[i].coef_amp / 254; break;
-      case TRG: val = TRG_TABLE[phase] * channels[i].coef_amp / 254; break;
-      case SAW: val = SAW_TABLE[phase] * channels[i].coef_amp / 254; break;
-      case SQR: val = SQR_TABLE[phase] * channels[i].coef_amp / 254; break;
+      const uint8_t* TABLE = NULL;
+
+      switch (channels[i].form)
+      {
+        case SIN : TABLE = SIN_TABLE; break;
+        case TRG : TABLE = TRG_TABLE; break;
+        case SAW : TABLE = SAW_TABLE; break;
+        case SQR : TABLE = SQR_TABLE; break;
+      }
+
+      int64_t dy0 = 0, dy = 0, dx = 0;
+
+      dy0 = ( (int32_t)TABLE[phase] - (int32_t)TABLE[phase == 0 ? 31 : phase - 1] );
+      dx = (channels[i].shift_phase + channels[i].current_phase) % 100000;
+      dy = dy0 * dx / 100000;
+
+      val = ( (int32_t)TABLE[phase] + dy ) * channels[i].coef_amp / 254; 
+
+      if(val > 255) 
+        val = 255;
+      else if(val < 0) 
+        val = 0;
+    }
+    else
+      val = 0;
+
+    switch(i)
+    {
+      case 0 : dac_output_voltage(DAC_CHANNEL_1, val); break;
+      case 1 : dac_output_voltage(DAC_CHANNEL_2, val); break;
     }
 
-    if (i == 0)
-      dac_output_voltage(DAC_CHANNEL_1, val);
-    else
-      dac_output_voltage(DAC_CHANNEL_2, val);
-
     channels[i].current_phase += channels[i].step_phase;
-    if(channels[i].current_phase >= 3200000)
-      channels[i].current_phase -= 3200000;
+
+    if(channels[i].current_phase >= 3200000) channels[i].current_phase -= 3200000;
   }
 }
