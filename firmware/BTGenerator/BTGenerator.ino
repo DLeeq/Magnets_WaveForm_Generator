@@ -1,6 +1,8 @@
-#include "dataReceiver.h"
-#include "generator.h"
 #include "driver/dac.h"
+
+#include "dataChannels.h"
+#include "receiver.h"
+#include "generator.h"
 
 hw_timer_t* timer = NULL;
 
@@ -13,8 +15,7 @@ void setup()
 {
   SerialBT.begin("ESP32 (30PIN)");
 
-  channels[0].current_phase = 0; //Сброс фазовых накопителей для синхронизации до запуска прерываний
-  channels[1].current_phase = 0; //Сброс фазовых накопителей для синхронизации до запуска прерываний
+  channelsInit(); //Инициализация нулями значений полей каналов генерации
 
   timer = timerBegin(32000);
   timerAttachInterrupt(timer, &onTimer);

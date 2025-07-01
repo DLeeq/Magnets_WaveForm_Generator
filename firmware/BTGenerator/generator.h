@@ -2,8 +2,9 @@
 #define GENERATOR_H
 
 #include <Arduino.h>
-#include "dataChannels.h"
 #include "driver/dac.h"
+
+#include "dataChannels.h"
 
 #define TABLE_SIZE 32
 

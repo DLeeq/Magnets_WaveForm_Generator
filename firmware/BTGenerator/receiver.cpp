@@ -1,4 +1,4 @@
-#include "dataReceiver.h"
+#include "receiver.h"
 
 BluetoothSerial SerialBT;
 
@@ -33,8 +33,7 @@ void bufHandler()
 
   noInterrupts();
 
-  channels[0].current_phase = 0; //Сброс фазовых накопителей для синхронизации
-  channels[1].current_phase = 0; //Сброс фазовых накопителей для синхронизации
+  channelsSync(); //Синхронизация каналов
 
   interrupts();
 

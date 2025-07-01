@@ -1,5 +1,5 @@
-#ifndef DATARECEIVER_H
-#define DATARECEIVER_H
+#ifndef RECEIVER_H
+#define RECEIVER_H
 
 #include <Arduino.h>
 #include "BluetoothSerial.h"

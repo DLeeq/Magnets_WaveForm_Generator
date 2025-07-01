@@ -28,4 +28,7 @@ struct GenChannel
 
 extern GenChannel channels[2];
 
+void channelsInit(); //Инициализация каналов нулями
+void channelsSync(); //Функция принудительной синхронизации всех каналов
+
 #endif
