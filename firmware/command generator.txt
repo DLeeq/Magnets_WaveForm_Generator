@@ -1,0 +1,55 @@
+#include <iostream>
+#include <iomanip>
+#include <cstdint>
+
+uint8_t CRC8(const uint8_t *data, uint8_t length) 
+{
+   uint8_t crc = 0x00;
+   uint8_t extract;
+   uint8_t sum;
+
+    for(uint8_t i = 0; i < length; i++)
+    {
+      extract = *data;
+
+      for (uint8_t tempI = 8; tempI; tempI--) 
+      {
+         sum = (crc ^ extract) & 0x01;
+         crc >>= 1;
+         if (sum)
+            crc ^= 0x8C;
+         extract >>= 1;
+      }
+
+      data++;
+    }
+
+    if(crc == 0xFF)
+      crc = 0xA7;
+
+   return crc;
+}
+
+const int channel = 1;
+const int form = 1;
+const int amp = 111;
+const int freq = 111;
+const int phase = 111;
+
+uint8_t buf[6] = {  (channel << 4)|form, amp, 
+                    (int)(freq)/255/255%255, 
+                    (int)(freq)/255%255, 
+                    (int)(freq)%255, 
+                    phase   };
+
+int main()
+{
+    std::cout << "ff" << " ";
+    
+    for(int i = 0; i < 6; i++)
+        std::cout << std::hex << (int)buf[i] << " ";
+
+    std::cout << std::hex << (int)CRC8(buf, 6) << " ";
+
+    return 0;
+}
