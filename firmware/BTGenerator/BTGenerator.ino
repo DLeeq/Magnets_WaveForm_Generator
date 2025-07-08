@@ -27,5 +27,5 @@ void setup()
 
 void loop() 
 {
-  dataReader();  
+  SDC8Reading(0xFF, 6);  
 }

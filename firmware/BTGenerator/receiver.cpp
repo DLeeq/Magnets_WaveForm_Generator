@@ -87,7 +87,7 @@ uint8_t CRC8(const uint8_t *data, uint8_t length)
    return crc;
 }
 
-void dataReader()
+void SDC8Reading(uint8_t start_byte, uint8_t len_data)
 {
   static bool data_reading = false;
   static uint8_t data_counter = 0;
@@ -98,25 +98,26 @@ void dataReader()
 
     if(!data_reading)
     {
-      if(data_byte == 0xFF)
+      if(data_byte == start_byte)
         data_reading = true;
     }
     else
     {
-      if(data_byte == 0xFF)
+      if(data_byte == start_byte)
         data_counter = 0;
       else
       {
-        buf[data_counter] = data_byte;
-
-        data_counter++;
-
-        if(data_counter >= BUFFER_SIZE)
+        if(data_counter < len_data)
+        {
+          buf[data_counter] = data_byte;
+          data_counter++;
+        }
+        else
         {
           data_reading = false;
           data_counter = 0;
 
-          if(buf[BUFFER_SIZE - 1] == CRC8(buf, BUFFER_SIZE - 1))
+          if(data_byte == CRC8(buf, len_data))
             bufHandler();
         }
       }
