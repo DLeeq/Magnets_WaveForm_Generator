@@ -11,15 +11,13 @@ void bufferHandler(uint8_t *buf, uint8_t buf_size);
 
 void IRAM_ATTR onTimer() 
 {
-  signalGenerator();
+  genTicker();
 }
-
 
 void setup() 
 {
-  SerialBT.begin("ESP32 (30PIN)");
-
-  channelsInit(); //Инициализация генератора на каналах цап и обнуление значений полей каналов генерации
+  receiverInit("ESP32");
+  genChannelsInit(); //Инициализация генератора на каналах цап и обнуление значений полей каналов генерации
 
   timer = timerBegin(32000);
   timerAttachInterrupt(timer, &onTimer);
@@ -58,7 +56,7 @@ void bufferHandler(uint8_t *buf, uint8_t buf_size)
 
   noInterrupts();
 
-  channelsSync(); //Синхронизация каналов
+  genChannelsSync(); //Синхронизация каналов
 
   interrupts();
 

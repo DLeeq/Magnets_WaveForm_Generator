@@ -30,7 +30,7 @@ const uint8_t SQR_TABLE[TABLE_SIZE] = {
 
 GenChannel channels[2];
 
-void channelsInit()
+void genChannelsInit()
 {
   dac_output_enable(DAC_CHANNEL_1); 
   dac_output_enable(DAC_CHANNEL_2);
@@ -51,13 +51,13 @@ void channelsInit()
   }
 }
 
-void channelsSync()
+void genChannelsSync()
 {
   for(uint8_t i = 0; i < 2; i++)
     channels[i].current_phase = 0;
 }
 
-void IRAM_ATTR signalGenerator()
+void IRAM_ATTR genTicker()
 {
   for(uint8_t i = 0; i < 2; i++)
   {
