@@ -28,6 +28,35 @@ const uint8_t SQR_TABLE[TABLE_SIZE] = {
    0,   0,   0,   0,   0,   0,   0,   0
 };
 
+GenChannel channels[2];
+
+void channelsInit()
+{
+  dac_output_enable(DAC_CHANNEL_1); 
+  dac_output_enable(DAC_CHANNEL_2);
+
+  for(uint8_t i = 0; i < 2; i++)
+  {
+    channels[i].form = OFF;
+
+    channels[i].amp = 0;
+    channels[i].freq = 0;
+    channels[i].phase = 0;
+    
+    channels[i].coef_amp = 0;
+    channels[i].step_phase = 0;
+    channels[i].shift_phase = 0;
+
+    channels[i].current_phase = 0;
+  }
+}
+
+void channelsSync()
+{
+  for(uint8_t i = 0; i < 2; i++)
+    channels[i].current_phase = 0;
+}
+
 void IRAM_ATTR signalGenerator()
 {
   for(uint8_t i = 0; i < 2; i++)

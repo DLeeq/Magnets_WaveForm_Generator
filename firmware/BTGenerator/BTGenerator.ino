@@ -1,6 +1,5 @@
 #include "driver/dac.h"
 
-#include "dataChannels.h"
 #include "receiver.h"
 #include "generator.h"
 
@@ -20,14 +19,11 @@ void setup()
 {
   SerialBT.begin("ESP32 (30PIN)");
 
-  channelsInit(); //Инициализация нулями значений полей каналов генерации
+  channelsInit(); //Инициализация генератора на каналах цап и обнуление значений полей каналов генерации
 
   timer = timerBegin(32000);
   timerAttachInterrupt(timer, &onTimer);
   timerAlarm(timer, 1, true, 0);
-
-  dac_output_enable(DAC_CHANNEL_1); 
-  dac_output_enable(DAC_CHANNEL_2);
 }
 
 void loop() 
