@@ -30,7 +30,7 @@ const uint8_t SQR_TABLE[TABLE_SIZE] = {
 
 GenChannel channels[2];
 
-void genChannelsInit()
+void genInit()
 {
   dac_output_enable(DAC_CHANNEL_1); 
   dac_output_enable(DAC_CHANNEL_2);

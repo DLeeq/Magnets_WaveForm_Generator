@@ -17,7 +17,7 @@ void IRAM_ATTR onTimer()
 void setup() 
 {
   receiverInit("ESP32");
-  genChannelsInit(); //Инициализация генератора на каналах цап и обнуление значений полей каналов генерации
+  genInit(); //Инициализация генератора на каналах цап и обнуление значений полей каналов генерации
 
   timer = timerBegin(32000);
   timerAttachInterrupt(timer, &onTimer);
