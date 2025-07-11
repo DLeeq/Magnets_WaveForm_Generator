@@ -7,7 +7,7 @@ void bufferHandler(uint8_t *buf, uint8_t buf_size);
 
 void setup() 
 {
-  receiverInit("ESP32");
+  recvInit("ESP32"); //Инициализация приемника блютуз
   genInit(); //Инициализация генератора на каналах цап и обнуление значений полей каналов генерации
 }
 

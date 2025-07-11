@@ -68,6 +68,11 @@ void genSync()
     channels[i].current_phase = 0;
 }
 
+void genChSet(uint8_t channel, FormChannel form, uint16_t amp, float freq, uint16_t phase)
+{
+  //coming soon..
+}
+
 static void IRAM_ATTR genTick()
 {
   for(uint8_t i = 0; i < CHANNELS_COUNT; i++)

@@ -37,5 +37,6 @@ extern GenChannel channels[CHANNELS_COUNT];
 
 void genInit(); //Инициализация каналов нулями
 void genSync(); //Функция принудительной синхронизации всех каналов
+void genChSet(uint8_t channel, FormChannel form, uint16_t amp, float freq, uint16_t phase);//Функция установки параметров канала
 
 #endif

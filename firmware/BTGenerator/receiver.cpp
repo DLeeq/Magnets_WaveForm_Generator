@@ -30,7 +30,7 @@ static uint8_t CRC8(const uint8_t *data, uint8_t length)
    return crc;
 }
 
-void receiverInit(String id)
+void recvInit(String id)
 {
   SerialBT.begin(id);
 }
