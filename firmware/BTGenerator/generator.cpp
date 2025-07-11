@@ -28,14 +28,21 @@ const uint8_t SQR_TABLE[TABLE_SIZE] = {
    0,   0,   0,   0,   0,   0,   0,   0
 };
 
-GenChannel channels[2];
+GenChannel channels[CHANNELS_COUNT];
+
+static void IRAM_ATTR genTick();
+
+void IRAM_ATTR onTimer() 
+{
+  genTick();
+}
 
 void genInit()
 {
   dac_output_enable(DAC_CHANNEL_1); 
   dac_output_enable(DAC_CHANNEL_2);
 
-  for(uint8_t i = 0; i < 2; i++)
+  for(uint8_t i = 0; i < CHANNELS_COUNT; i++)
   {
     channels[i].form = OFF;
 
@@ -49,17 +56,21 @@ void genInit()
 
     channels[i].current_phase = 0;
   }
+
+  static hw_timer_t* timer = timerBegin(32000);
+  timerAttachInterrupt(timer, &onTimer);
+  timerAlarm(timer, 1, true, 0);
 }
 
 void genSync()
 {
-  for(uint8_t i = 0; i < 2; i++)
+  for(uint8_t i = 0; i < CHANNELS_COUNT; i++)
     channels[i].current_phase = 0;
 }
 
-void IRAM_ATTR genTick()
+static void IRAM_ATTR genTick()
 {
-  for(uint8_t i = 0; i < 2; i++)
+  for(uint8_t i = 0; i < CHANNELS_COUNT; i++)
   {
     uint32_t phase = 0;
     phase = (channels[i].shift_phase + channels[i].current_phase) * 32 / 3200000;

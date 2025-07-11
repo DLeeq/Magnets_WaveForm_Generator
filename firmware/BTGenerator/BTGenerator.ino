@@ -3,25 +3,12 @@
 #include "receiver.h"
 #include "generator.h"
 
-
-hw_timer_t* timer = NULL;
-
-
 void bufferHandler(uint8_t *buf, uint8_t buf_size);
-
-void IRAM_ATTR onTimer() 
-{
-  genTick();
-}
 
 void setup() 
 {
   receiverInit("ESP32");
   genInit(); //Инициализация генератора на каналах цап и обнуление значений полей каналов генерации
-
-  timer = timerBegin(32000);
-  timerAttachInterrupt(timer, &onTimer);
-  timerAlarm(timer, 1, true, 0);
 }
 
 void loop() 
@@ -62,7 +49,7 @@ void bufferHandler(uint8_t *buf, uint8_t buf_size)
 
   //ВЫВОД ЗНАЧЕНИЙ КАНАЛОВ В ТЕРМИНАЛ
   SerialBT.println("                   -------CHANNELS INFO-------");
-  for(uint8_t i = 0; i < 2; i++)
+  for(uint8_t i = 0; i < CHANNELS_COUNT; i++)
   {
     SerialBT.println("Channel: " + String(i));
 

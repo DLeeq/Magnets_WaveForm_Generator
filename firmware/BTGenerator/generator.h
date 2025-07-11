@@ -5,6 +5,7 @@
 #include "driver/dac.h"
 
 #define TABLE_SIZE 32
+#define CHANNELS_COUNT 2
 
 extern const uint8_t SIN_TABLE[TABLE_SIZE];
 extern const uint8_t TRG_TABLE[TABLE_SIZE];
@@ -32,11 +33,9 @@ struct GenChannel
   uint32_t current_phase;
 };
 
-extern GenChannel channels[2];
+extern GenChannel channels[CHANNELS_COUNT];
 
 void genInit(); //Инициализация каналов нулями
 void genSync(); //Функция принудительной синхронизации всех каналов
-
-void IRAM_ATTR genTick();
 
 #endif
