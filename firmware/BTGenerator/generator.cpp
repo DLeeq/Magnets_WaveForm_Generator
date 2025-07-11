@@ -68,9 +68,21 @@ void genSync()
     channels[i].current_phase = 0;
 }
 
-void genChSet(uint8_t channel, FormChannel form, uint16_t amp, float freq, uint16_t phase)
+void genChSet(uint8_t channel, FormChannel form, float amp, float freq, float phase)
 {
-  //coming soon..
+  //Форма сигнала на канале
+  channels[channel].form = form;
+
+  //Амплитуда, частота и фаза (0...100.00, 0...1000.00, 0...360.00)
+  channels[channel].amp = amp;    //(0...100.00 %)
+  channels[channel].freq = freq;  //(0...1000.00 Hz)
+  channels[channel].phase = phase;//(0...360.00 deg);
+
+  //Предварительные вычисления удобных значений
+  //для ускорения работы прерываний
+  channels[channel].coef_amp = (uint32_t)(amp * 254 / 100.0); //(0...254)
+  channels[channel].step_phase = (uint32_t)(freq * 100000 / 1000.0); //(0...100000)
+  channels[channel].shift_phase = (uint32_t)(phase * 3200000 / 360.0); //(0...3200000)
 }
 
 static void IRAM_ATTR genTick()

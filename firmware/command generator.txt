@@ -32,18 +32,18 @@ uint8_t CRC8(const uint8_t *data, uint8_t length)
    return crc;
 }
 
-const int channel = 1;
-const FormChannel form = SIN;
-const int amp = 100; //[%]
-const float freq = 230; //[Hz]
-const int phase = 180; //[°]
+const int channel = 0;
+const FormChannel form = TRG;
+const float amp = 57; //[%]
+const float freq = 20; //[Hz]
+const float phase = 320; //[°]
 
 uint8_t buf[8] = { 0xFF, (channel << 4) | form, 
-                    amp * 254 / 100, 
+                    (int)(amp * 254 / 100.0), 
                     (int)(freq*100)/255/255%255, 
                     (int)(freq*100)/255%255, 
                     (int)(freq*100)%255, 
-                    phase * 254 / 360,
+                    (int)(phase * 254 / 360.0),
                     (int)CRC8(buf+1, 6)
                     };
 
