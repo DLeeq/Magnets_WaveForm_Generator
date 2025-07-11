@@ -35,8 +35,8 @@ struct GenChannel
 extern GenChannel channels[2];
 
 void genInit(); //Инициализация каналов нулями
-void genChannelsSync(); //Функция принудительной синхронизации всех каналов
+void genSync(); //Функция принудительной синхронизации всех каналов
 
-void IRAM_ATTR genTicker();
+void IRAM_ATTR genTick();
 
 #endif

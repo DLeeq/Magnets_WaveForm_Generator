@@ -51,13 +51,13 @@ void genInit()
   }
 }
 
-void genChannelsSync()
+void genSync()
 {
   for(uint8_t i = 0; i < 2; i++)
     channels[i].current_phase = 0;
 }
 
-void IRAM_ATTR genTicker()
+void IRAM_ATTR genTick()
 {
   for(uint8_t i = 0; i < 2; i++)
   {

@@ -11,7 +11,7 @@ void bufferHandler(uint8_t *buf, uint8_t buf_size);
 
 void IRAM_ATTR onTimer() 
 {
-  genTicker();
+  genTick();
 }
 
 void setup() 
@@ -56,7 +56,7 @@ void bufferHandler(uint8_t *buf, uint8_t buf_size)
 
   noInterrupts();
 
-  genChannelsSync(); //Синхронизация каналов
+  genSync(); //Синхронизация каналов
 
   interrupts();
 
