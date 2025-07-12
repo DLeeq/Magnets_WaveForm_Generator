@@ -1,5 +1,3 @@
-#include "driver/dac.h"
-
 #include "receiver.h"
 #include "generator.h"
 
@@ -22,18 +20,14 @@ void loop()
 
 void bufferHandler(uint8_t *buf, uint8_t buf_size)
 {
+  //Значение канала и формы сигнала
   uint8_t ch_num = buf[0] >> 4;
   FormChannel form = (FormChannel)(buf[0] & 0xF);
-
-  //Сырые значения амплитуды, частоты и фазы (0...254, 0...100000, 0...254)
-  uint8_t raw_amp = buf[1];
-  uint32_t raw_freq = buf[2] * 255 * 255 + buf[3] * 255 + buf[4];
-  uint8_t raw_phase = buf[5];
-
-  //Обработанные значения амплитуды, частоты и фазы (0...100.00, 0...1000.00, 0...360.00)
-  float amp = raw_amp * 100.0 / 254;
-  float freq = raw_freq * 1000.0 / 100000;
-  float phase = raw_phase * 360.0 / 254;
+  
+  //Значения амплитуды, частоты и фазы (0...100.00, 0...1000.00, 0...360.00)
+  float amp = buf[1] * 100.0 / 254;
+  float freq = (buf[2] * 255 * 255 + buf[3] * 255 + buf[4]) * 1000.0 / 100000;
+  float phase = buf[5] * 360.0 / 254;
 
   //Установка параметров канала
   genChSet(ch_num, form, amp, freq, phase);
