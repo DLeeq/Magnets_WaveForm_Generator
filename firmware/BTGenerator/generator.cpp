@@ -1,5 +1,7 @@
 #include "generator.h"
 
+#define TABLE_SIZE 32
+
 const uint8_t SIN_TABLE[TABLE_SIZE] = {
   128, 153, 178, 200, 221, 237, 248, 254,
   255, 254, 248, 237, 221, 200, 178, 153,
@@ -28,7 +30,24 @@ const uint8_t SQR_TABLE[TABLE_SIZE] = {
    0,   0,   0,   0,   0,   0,   0,   0
 };
 
-GenChannel channels[CHANNELS_COUNT];
+struct GenChannel
+{
+  FormChannel form;
+
+  //Амплитуда, частота и фаза (0...100.00, 0...1000.00, 0...360.00)
+  float amp;
+  float freq;
+  float phase;
+
+  //Предварительные вычисленные удобные значения
+  //для ускорения работы прерываний
+  uint32_t coef_amp;
+  uint32_t step_phase;
+  uint32_t shift_phase;
+
+  //Фазовый накопитель
+  uint32_t current_phase;
+} arr_channels[CHANNELS_COUNT];
 
 static void IRAM_ATTR genTick();
 
@@ -44,17 +63,17 @@ void genInit()
 
   for(uint8_t i = 0; i < CHANNELS_COUNT; i++)
   {
-    channels[i].form = OFF;
+    arr_channels[i].form = OFF;
 
-    channels[i].amp = 0;
-    channels[i].freq = 0;
-    channels[i].phase = 0;
+    arr_channels[i].amp = 0;
+    arr_channels[i].freq = 0;
+    arr_channels[i].phase = 0;
     
-    channels[i].coef_amp = 0;
-    channels[i].step_phase = 0;
-    channels[i].shift_phase = 0;
+    arr_channels[i].coef_amp = 0;
+    arr_channels[i].step_phase = 0;
+    arr_channels[i].shift_phase = 0;
 
-    channels[i].current_phase = 0;
+    arr_channels[i].current_phase = 0;
   }
 
   static hw_timer_t* timer = timerBegin(32000);
@@ -65,42 +84,72 @@ void genInit()
 void genSync()
 {
   for(uint8_t i = 0; i < CHANNELS_COUNT; i++)
-    channels[i].current_phase = 0;
+    arr_channels[i].current_phase = 0;
 }
 
 void genChSet(uint8_t channel, FormChannel form, float amp, float freq, float phase)
 {
   //Форма сигнала на канале
-  channels[channel].form = form;
+  arr_channels[channel].form = form;
 
   //Амплитуда, частота и фаза (0...100.00, 0...1000.00, 0...360.00)
-  channels[channel].amp = amp;    //(0...100.00 %)
-  channels[channel].freq = freq;  //(0...1000.00 Hz)
-  channels[channel].phase = phase;//(0...360.00 deg);
+  arr_channels[channel].amp = amp;    //(0...100.00 %)
+  arr_channels[channel].freq = freq;  //(0...1000.00 Hz)
+  arr_channels[channel].phase = phase;//(0...360.00 deg);
 
   //Предварительные вычисления удобных значений
   //для ускорения работы прерываний
-  channels[channel].coef_amp = (uint32_t)(amp * 254 / 100.0); //(0...254)
-  channels[channel].step_phase = (uint32_t)(freq * 100000 / 1000.0); //(0...100000)
-  channels[channel].shift_phase = (uint32_t)(phase * 3200000 / 360.0); //(0...3200000)
+  arr_channels[channel].coef_amp = (uint32_t)(amp * 254 / 100.0); //(0...254)
+  arr_channels[channel].step_phase = (uint32_t)(freq * 100000 / 1000.0); //(0...100000)
+  arr_channels[channel].shift_phase = (uint32_t)(phase * 3200000 / 360.0); //(0...3200000)
 }
+
+//Геттеры
+FormChannel genChGetForm(uint8_t channel)
+{ 
+  return arr_channels[channel].form;
+} 
+float genChGetAmp(uint8_t channel)
+{ 
+  return arr_channels[channel].amp;
+}              
+float genChGetFreq(uint8_t channel)
+{ 
+  return arr_channels[channel].freq;
+}            
+float genChGetPhase(uint8_t channel)
+{ 
+  return arr_channels[channel].phase;
+}            
+uint32_t genChGetCoefAmp(uint8_t channel)
+{ 
+  return arr_channels[channel].coef_amp;
+}       
+uint32_t genChGetStepPhase(uint8_t channel)
+{ 
+  return arr_channels[channel].step_phase;
+}     
+uint32_t genChGetShiftPhase(uint8_t channel)
+{ 
+  return arr_channels[channel].shift_phase;
+}   
 
 static void IRAM_ATTR genTick()
 {
   for(uint8_t i = 0; i < CHANNELS_COUNT; i++)
   {
     uint32_t phase = 0;
-    phase = (channels[i].shift_phase + channels[i].current_phase) * 32 / 3200000;
+    phase = (arr_channels[i].shift_phase + arr_channels[i].current_phase) * 32 / 3200000;
 
     if(phase >= 32) phase -= 32;
 
     int32_t val = 0;
 
-    if(channels[i].form != OFF)
+    if(arr_channels[i].form != OFF)
     {
       const uint8_t* TABLE = NULL;
 
-      switch (channels[i].form)
+      switch (arr_channels[i].form)
       {
         case SIN : TABLE = SIN_TABLE; break;
         case TRG : TABLE = TRG_TABLE; break;
@@ -111,10 +160,10 @@ static void IRAM_ATTR genTick()
       int64_t dy0 = 0, dy = 0, dx = 0;
 
       dy0 = ( (int32_t)TABLE[phase] - (int32_t)TABLE[phase == 0 ? 31 : phase - 1] );
-      dx = (channels[i].shift_phase + channels[i].current_phase) % 100000;
+      dx = (arr_channels[i].shift_phase + arr_channels[i].current_phase) % 100000;
       dy = dy0 * dx / 100000;
 
-      val = ( (int32_t)TABLE[phase] + dy ) * channels[i].coef_amp / 254; 
+      val = ( (int32_t)TABLE[phase] + dy ) * arr_channels[i].coef_amp / 254; 
 
       if(val > 255) 
         val = 255;
@@ -130,8 +179,8 @@ static void IRAM_ATTR genTick()
       case 1 : dac_output_voltage(DAC_CHANNEL_2, val); break;
     }
 
-    channels[i].current_phase += channels[i].step_phase;
+    arr_channels[i].current_phase += arr_channels[i].step_phase;
 
-    if(channels[i].current_phase >= 3200000) channels[i].current_phase -= 3200000;
+    if(arr_channels[i].current_phase >= 3200000) arr_channels[i].current_phase -= 3200000;
   }
 }

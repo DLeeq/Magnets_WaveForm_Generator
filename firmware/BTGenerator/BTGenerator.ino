@@ -8,14 +8,14 @@ void printChannelsInfo();
 
 void setup() 
 {
-  recvInit("ESP32"); //Инициализация приемника блютуз
+  rvrInit("ESP32"); //Инициализация приемника блютуз
   genInit(); //Инициализация генератора на каналах цап и обнуление значений полей каналов генерации
 }
 
 void loop() 
 {
   static uint8_t buffer[8];
-  SDC8Reading(0xFF, 6, buffer, 8, bufferHandler);  
+  rvrSDC8Reading(0xFF, 6, buffer, 8, bufferHandler);  
 }
 
 //USER FUNCS
@@ -55,7 +55,7 @@ void printChannelsInfo()
     SerialBT.println("Channel: " + String(i));
 
     SerialBT.print("    Form: ");
-    switch(channels[i].form)
+    switch(genChGetForm(i))
     {
       case OFF : SerialBT.println("OFF"); break;
       case SIN : SerialBT.println("SIN"); break;
@@ -64,12 +64,12 @@ void printChannelsInfo()
       case SQR : SerialBT.println("SQR"); break;
     }
 
-    SerialBT.println("    Amplitude: " + String(channels[i].amp, 1) + "% (" + String(3.3 * channels[i].amp / 100.0, 1) + "V | " + String(12.0 * channels[i].amp / 100.0, 1) + "V)");
-    SerialBT.println("    Frequency: " + String(channels[i].freq, 2) + "Hz");
-    SerialBT.println("    Phase: " + String(channels[i].phase, 0) + "°");
-    SerialBT.println("    Coef Amp: " + String(channels[i].coef_amp));
-    SerialBT.println("    Step Phase: " + String(channels[i].step_phase));
-    SerialBT.println("    Shift Phase: " + String(channels[i].shift_phase));
+    SerialBT.println("    Amplitude: " + String(genChGetAmp(i), 1) + "% (" + String(3.3 * genChGetAmp(i) / 100.0, 1) + "V | " + String(12.0 * genChGetAmp(i) / 100.0, 1) + "V)");
+    SerialBT.println("    Frequency: " + String(genChGetFreq(i), 2) + "Hz");
+    SerialBT.println("    Phase: " + String(genChGetPhase(i), 0) + "°");
+    SerialBT.println("    Coef Amp: " + String(genChGetCoefAmp(i)));
+    SerialBT.println("    Step Phase: " + String(genChGetStepPhase(i)));
+    SerialBT.println("    Shift Phase: " + String(genChGetShiftPhase(i)));
 
     SerialBT.println("----------------------------");
   }

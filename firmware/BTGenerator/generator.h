@@ -4,39 +4,22 @@
 #include <Arduino.h>
 #include "driver/dac.h"
 
-#define TABLE_SIZE 32
 #define CHANNELS_COUNT 2
-
-extern const uint8_t SIN_TABLE[TABLE_SIZE];
-extern const uint8_t TRG_TABLE[TABLE_SIZE];
-extern const uint8_t SAW_TABLE[TABLE_SIZE];
-extern const uint8_t SQR_TABLE[TABLE_SIZE];
 
 enum FormChannel {OFF, SIN, TRG, SAW, SQR};
 
-struct GenChannel
-{
-  FormChannel form;
-
-  //Амплитуда, частота и фаза (0...100.00, 0...1000.00, 0...360.00)
-  float amp;
-  float freq;
-  float phase;
-
-  //Предварительные вычисленные удобные значения
-  //для ускорения работы прерываний
-  uint32_t coef_amp;
-  uint32_t step_phase;
-  uint32_t shift_phase;
-
-  //Фазовый накопитель
-  uint32_t current_phase;
-};
-
-extern GenChannel channels[CHANNELS_COUNT];
-
 void genInit(); //Инициализация каналов нулями
+
 void genSync(); //Функция принудительной синхронизации всех каналов
-void genChSet(uint8_t channel, FormChannel form, float amp, float freq, float phase);//Функция установки параметров канала
+
+void genChSet(uint8_t channel, FormChannel form, float amp, float freq, float phase);//Сеттер, Функция установки параметров канала
+
+FormChannel genChGetForm(uint8_t channel);       //
+float genChGetAmp(uint8_t channel);              //
+float genChGetFreq(uint8_t channel);             //
+float genChGetPhase(uint8_t channel);            //Геттеры
+uint32_t genChGetCoefAmp(uint8_t channel);       //
+uint32_t genChGetStepPhase(uint8_t channel);     //
+uint32_t genChGetShiftPhase(uint8_t channel);    //
 
 #endif
